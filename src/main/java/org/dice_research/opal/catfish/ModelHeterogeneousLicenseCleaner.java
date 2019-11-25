@@ -21,7 +21,6 @@ public class ModelHeterogeneousLicenseCleaner {
 	public static void CleanThisLicense(HashMap<Statement, Object> StatementsWithLicense,
 			HashMap<Statement, RDFNode> TheUpdater, Statement CurrentStatement, Object license) {
 
-		// System.out.println("License Entered:" + license);
 
 		// Its used to check if a new license or not
 		boolean isNewLicense = true;
@@ -42,8 +41,6 @@ public class ModelHeterogeneousLicenseCleaner {
 		String PatternRegX2 = "^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.)(europeandataportal.eu\\/)";
 
 		if (!(StatementsWithLicense.containsValue(license))) {
-
-			System.out.println("Entered license : " + license.toString());
 
 			for (Statement key : StatementsWithLicense.keySet()) {
 

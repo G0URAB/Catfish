@@ -41,8 +41,6 @@ public class ModelHomogeneousLicenseChecker {
 
 		if (!(StatementsWithLicense.containsValue(license))) {
 
-			//System.out.println("Entered license : " + license.toString());
-
 			for (Statement key : StatementsWithLicense.keySet()) {
 
 				/*
