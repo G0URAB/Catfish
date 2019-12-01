@@ -18,7 +18,110 @@ public class ModelHomogeneousLicenseChecker {
 
 	static int TotalNumberOfHetrogeneousLicenseinModel = 0;
 
-	public static void CleanThisLicense(HashMap<Statement, Object> StatementsWithLicense, Statement CurrentStatement,
+	/*
+	 * Checks if heterogeneous URI links to same license exits or not. If yes, then
+	 * increment TotalNumberOfHetrogeneousLicenseinModel
+	 */
+	public static void CreativeCommonsDcatOpenDefinition_LicenseChecker(
+			HashMap<Statement, Object> StatementsWithLicense) {
+
+		for (Statement CurrentStatement : StatementsWithLicense.keySet()) {
+
+			//System.out.println("Unique License to check :" + StatementsWithLicense.get(CurrentStatement));
+
+			// If creative commons license contains "legal" keyword then not homogeneous
+			Pattern pattern_CCLegalcode = Pattern.compile("\\w+(legalcode|legalcode\\/)", Pattern.CASE_INSENSITIVE);
+			Matcher matcher_CCLegalcode = pattern_CCLegalcode
+					.matcher(StatementsWithLicense.get(CurrentStatement).toString().toString());
+			if (matcher_CCLegalcode.find())
+				TotalNumberOfHetrogeneousLicenseinModel++;
+
+			// If creative commons license contains "deed.language" keyword then not
+			// homogeneous
+			Pattern pattern_CCDeed = Pattern.compile("(deed\\.\\D+)", Pattern.CASE_INSENSITIVE);
+			Matcher matcher_CCDeed = pattern_CCDeed
+					.matcher(StatementsWithLicense.get(CurrentStatement).toString().toString());
+			if (matcher_CCDeed.find())
+				TotalNumberOfHetrogeneousLicenseinModel++;
+
+			if (StatementsWithLicense.get(CurrentStatement).toString()
+					.contains("opendefinition.org/licenses/cc-zero")) {
+				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
+					if (StatementsWithLicense.get(CurrentStatement1).toString()
+							.contains("creativecommons.org/publicdomain/zero/1.0"))
+						TotalNumberOfHetrogeneousLicenseinModel++;
+				}
+			}
+
+			if (StatementsWithLicense.get(CurrentStatement).toString()
+					.contains("dcat-ap.de/def/licenses/dl-by-de/2.0")) {
+				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
+					if (StatementsWithLicense.get(CurrentStatement1).toString().contains("govdata.de/dl-de/by-2-0"))
+						TotalNumberOfHetrogeneousLicenseinModel++;
+				}
+			}
+
+			if (StatementsWithLicense.get(CurrentStatement).toString()
+					.contains("dcat-ap.de/def/licenses/dl-zero-de/2.0")) {
+				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
+					if (StatementsWithLicense.get(CurrentStatement1).toString().contains("govdata.de/dl-de/zero-2-0"))
+						TotalNumberOfHetrogeneousLicenseinModel++;
+				}
+			}
+
+			if (StatementsWithLicense.get(CurrentStatement).toString().contains("dcat-ap.de/def/licenses/cc-zero")) {
+
+				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
+					if (StatementsWithLicense.get(CurrentStatement1).toString()
+							.contains("creativecommons.org/publicdomain/zero/1.0"))
+						TotalNumberOfHetrogeneousLicenseinModel++;
+				}
+			}
+
+			if (StatementsWithLicense.get(CurrentStatement).toString().contains("dcat-ap.de/def/licenses/cc-by/4.0")) {
+				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
+					if (StatementsWithLicense.get(CurrentStatement1).toString()
+							.contains("creativecommons.org/licenses/by/4.0"))
+						TotalNumberOfHetrogeneousLicenseinModel++;
+				}
+			}
+
+			if (StatementsWithLicense.get(CurrentStatement).toString()
+					.contains("dcat-ap.de/def/licenses/dl-by-nc-de/1.0")) {
+				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
+					if (StatementsWithLicense.get(CurrentStatement1).toString().contains("govdata.de/dl-de/by-nc-1-0"))
+						TotalNumberOfHetrogeneousLicenseinModel++;
+				}
+			}
+
+			if (StatementsWithLicense.get(CurrentStatement).toString().contains("dcat-ap.de/def/licenses/odbl")) {
+				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
+					if (StatementsWithLicense.get(CurrentStatement1).toString()
+							.contains("opendefinition.org/licenses/odc-odbl"))
+						TotalNumberOfHetrogeneousLicenseinModel++;
+				}
+			}
+
+			if (StatementsWithLicense.get(CurrentStatement).toString()
+					.contains("dcat-ap.de/def/licenses/dl-by-de/1.0")) {
+				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
+					if (StatementsWithLicense.get(CurrentStatement1).toString().contains("govdata.de/dl-de/by-1-0"))
+						TotalNumberOfHetrogeneousLicenseinModel++;
+				}
+			}
+
+			if (StatementsWithLicense.get(CurrentStatement).toString()
+					.contains("dcat-ap.de/def/licenses/cc-by-nd/4.0")) {
+				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
+					if (StatementsWithLicense.get(CurrentStatement1).toString()
+							.contains("creativecommons.org/licenses/by-nd/4.0"))
+						TotalNumberOfHetrogeneousLicenseinModel++;
+				}
+			}
+		}
+	}
+
+	public static void CheckThisLicense(HashMap<Statement, Object> StatementsWithLicense, Statement CurrentStatement,
 			Object license) {
 
 		// Its used to check if a new license or not
@@ -41,6 +144,8 @@ public class ModelHomogeneousLicenseChecker {
 
 		if (!(StatementsWithLicense.containsValue(license))) {
 
+			System.out.println("Entered license : " + license.toString());
+
 			for (Statement key : StatementsWithLicense.keySet()) {
 
 				/*
@@ -56,7 +161,7 @@ public class ModelHomogeneousLicenseChecker {
 						// System.out.println("It matched" + license.toString());
 						isNewLicense = false;
 						TotalNumberOfHetrogeneousLicenseinModel++;
-						break;
+
 					}
 
 					if (license.toString().contains("europeandataportal")) {
@@ -64,7 +169,8 @@ public class ModelHomogeneousLicenseChecker {
 						if (licenseToChange.equals(StatementsWithLicense.get(key).toString())) {
 							// System.out.println("Change -> " + licenseToChange);
 							isNewLicense = false;
-							break;
+							TotalNumberOfHetrogeneousLicenseinModel++;
+
 						}
 					}
 				}
@@ -80,10 +186,8 @@ public class ModelHomogeneousLicenseChecker {
 					if (matcher2.find()) {
 						// System.out.println("It matched" + license.toString());
 						TotalNumberOfHetrogeneousLicenseinModel++;
-						System.out.println("lol1: " + license.toString());
-						System.out.println("lol2: " + StatementsWithLicense.get(key).toString());
 						isNewLicense = false;
-						break;
+
 					}
 
 					if (license.toString().contains("europeandataportal")) {
@@ -91,7 +195,8 @@ public class ModelHomogeneousLicenseChecker {
 						if (licenseToChange.equals(StatementsWithLicense.get(key).toString())) {
 							// System.out.println("Change -> " + licenseToChange);
 							isNewLicense = false;
-							break;
+							TotalNumberOfHetrogeneousLicenseinModel++;
+
 						}
 					}
 				}
@@ -108,14 +213,15 @@ public class ModelHomogeneousLicenseChecker {
 						// System.out.println("It matched " + license.toString());
 						TotalNumberOfHetrogeneousLicenseinModel++;
 						isNewLicense = false;
-						break;
+
 					}
 					if (license.toString().contains("europeandataportal")) {
 						String licenseToChange = "file:///" + license.toString().toString().substring(30);
 						if (licenseToChange.equals(StatementsWithLicense.get(key).toString())) {
 							// System.out.println("Change -> " + licenseToChange);
 							isNewLicense = false;
-							break;
+							TotalNumberOfHetrogeneousLicenseinModel++;
+
 						}
 					}
 				} else if (license.toString().contains("http://")) {
@@ -126,7 +232,7 @@ public class ModelHomogeneousLicenseChecker {
 						// System.out.println("It matched" + license.toString());
 						TotalNumberOfHetrogeneousLicenseinModel++;
 						isNewLicense = false;
-						break;
+
 					}
 
 					if (license.toString().contains("europeandataportal")) {
@@ -134,7 +240,8 @@ public class ModelHomogeneousLicenseChecker {
 						if (licenseToChange.equals(StatementsWithLicense.get(key).toString())) {
 							// System.out.println("Change -> " + licenseToChange);
 							isNewLicense = false;
-							break;
+							TotalNumberOfHetrogeneousLicenseinModel++;
+
 						}
 					}
 					/*
@@ -174,7 +281,7 @@ public class ModelHomogeneousLicenseChecker {
 		}
 	}
 
-	public static boolean AreLicensesHomogeneous(Model model) {
+	public static boolean AreLicensesHomogeneous(Model model, String DatasetUri) {
 
 		// Collect statements with license/rights
 		HashMap<Statement, Object> StatementsWithLicense = new HashMap<Statement, Object>();
@@ -194,12 +301,12 @@ public class ModelHomogeneousLicenseChecker {
 				// System.out.println(DataSet.toString());
 				if (DataSet.hasProperty(DCTerms.license)
 						&& !(DataSet.getProperty(DCTerms.license).getObject().toString().isEmpty())) {
-					CleanThisLicense(StatementsWithLicense, DataSetSentence,
+					CheckThisLicense(StatementsWithLicense, DataSetSentence,
 							DataSet.getProperty(DCTerms.license).getObject());
 				}
 				if (DataSet.hasProperty(DCTerms.rights)
 						&& !(DataSet.getProperty(DCTerms.rights).getObject().toString().isEmpty())) {
-					CleanThisLicense(StatementsWithLicense, DataSetSentence,
+					CheckThisLicense(StatementsWithLicense, DataSetSentence,
 							DataSet.getProperty(DCTerms.rights).getObject());
 				}
 			}
@@ -218,22 +325,28 @@ public class ModelHomogeneousLicenseChecker {
 				// System.out.println(DataSet.toString());
 				if (Distribution.hasProperty(DCTerms.license)
 						&& !(Distribution.getProperty(DCTerms.license).getObject().toString().isEmpty())) {
-					CleanThisLicense(StatementsWithLicense, DistributionSentence,
+					CheckThisLicense(StatementsWithLicense, DistributionSentence,
 							Distribution.getProperty(DCTerms.license).getObject());
 
 				}
 				if (Distribution.hasProperty(DCTerms.rights)
 						&& !(Distribution.getProperty(DCTerms.rights).getObject().toString().isEmpty())) {
-					CleanThisLicense(StatementsWithLicense, DistributionSentence,
+					CheckThisLicense(StatementsWithLicense, DistributionSentence,
 							Distribution.getProperty(DCTerms.rights).getObject());
 
 				}
 			}
 		}
 
-		if(TotalNumberOfHetrogeneousLicenseinModel > 0)
+		/*
+		 * check if the model contains heterogeneous URI links that point to the same
+		 * license.
+		 */
+		CreativeCommonsDcatOpenDefinition_LicenseChecker(StatementsWithLicense);
+
+		if (TotalNumberOfHetrogeneousLicenseinModel > 0)
 			return false;
-		else 
+		else
 			return true;
 	}
 }

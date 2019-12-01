@@ -24,13 +24,13 @@ public class Catfish implements JenaModelProcessor {
 	public Model CleanLicenses(Model model, String datasetUri) throws Exception {
 
 		ModelHeterogeneousLicenseCleaner LicenseCleaner = new ModelHeterogeneousLicenseCleaner();
-		return LicenseCleaner.ModelLicenCleaner(model);
+		return LicenseCleaner.ModelLicenCleaner(model,datasetUri);
 	}
 	
 	public boolean AreLicensesHomogeneous(Model model, String datasetUri) throws Exception {
 
 		ModelHomogeneousLicenseChecker LicenseChecker = new ModelHomogeneousLicenseChecker();
-		return LicenseChecker.AreLicensesHomogeneous(model);
+		return LicenseChecker.AreLicensesHomogeneous(model,datasetUri);
 	}
 
 }

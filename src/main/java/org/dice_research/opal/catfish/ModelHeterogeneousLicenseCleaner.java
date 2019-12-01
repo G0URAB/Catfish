@@ -2,8 +2,10 @@ package org.dice_research.opal.catfish;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
@@ -18,13 +20,110 @@ import java.util.regex.Matcher;
 
 public class ModelHeterogeneousLicenseCleaner {
 
-	public static void CleanThisLicense(HashMap<Statement, Object> StatementsWithLicense,
-			HashMap<Statement, RDFNode> TheUpdater, Statement CurrentStatement, Object license) {
+	public static Object CreativeCommonsDcatOpenDefinition_LicenseCleaner(Object old_license) {
 
+		Object new_license = old_license;
+		Model CurrentModel = (Model) (((RDFNode) old_license).getModel());
+
+		/*
+		 * As per creative commons, deed keyword means “Human Readable”. If a creative
+		 * commons license contains the keyword “legalcode” then that reference is for
+		 * lawyers only. For regular people who are not lawyer they should refer the
+		 * license without the keyword “legalcode” i.e instead of
+		 * “https://creativecommons.org/licenses/by/4.0/legalcode” regular users should
+		 * refer “https://creativecommons.org/licenses/by/4.0/”
+		 * 
+		 * Which is also same as all other licenses as follows: 1.
+		 * http://creativecommons.org/licenses/by/4.0/deed.no 2.
+		 * https://creativecommons.org/licenses/by/4.0/deed.de 3.
+		 * https://creativecommons.org/licenses/by/4.0/deed.es_ES where .de, .no and
+		 * .es_Es are language code for German, Norway and Spain respectively, but they
+		 * refer to the same international license
+		 * “https://creativecommons.org/licenses/by/4.0/”.
+		 */
+		if (old_license.toString().contains("legalcode")) {
+			new_license = CurrentModel.createResource(old_license.toString().replace("legalcode", ""));
+		}
+
+		if (old_license.toString().contains("deed"))
+			new_license = CurrentModel.createResource(old_license.toString().replaceAll("(deed\\.\\D+)", ""));
+
+		/*
+		 * Open Definition group http://www.opendefinition.org/licenses/cc-zero points
+		 * to https://creativecommons.org/publicdomain/zero/1.0
+		 */
+		if (old_license.toString().contains("opendefinition.org/licenses/cc-zero"))
+			new_license = CurrentModel.createResource(old_license.toString()
+					.replaceAll("opendefinition.org/licenses/cc-zero", "creativecommons.org/publicdomain/zero/1.0"));
+
+		// dcat-ap.de/def/licenses/dl-by-de/2.0 ---> govdata.de/dl-de/by-2-0
+		if (old_license.toString().contains("dcat-ap.de/def/licenses/dl-by-de/2.0"))
+			new_license = CurrentModel.createResource(old_license.toString()
+					.replaceAll("dcat-ap.de/def/licenses/dl-by-de/2.0", "govdata.de/dl-de/by-2-0"));
+
+		// dcat-ap.de/def/licenses/dl-zero-de/2.0 ---> govdata.de/dl-de/zero-2-0
+		if (old_license.toString().contains("dcat-ap.de/def/licenses/dl-zero-de/2.0"))
+			new_license = CurrentModel.createResource(old_license.toString()
+					.replaceAll("dcat-ap.de/def/licenses/dl-zero-de/2.0", "govdata.de/dl-de/zero-2-0"));
+
+		// dcat-ap.de/def/licenses/cc-zero --->
+		// creativecommons.org/publicdomain/zero/1.0
+		if (old_license.toString().contains("dcat-ap.de/def/licenses/cc-zero"))
+			new_license = CurrentModel.createResource(old_license.toString()
+					.replaceAll("dcat-ap.de/def/licenses/cc-zero", "creativecommons.org/publicdomain/zero/1.0"));
+
+		// dcat-ap.de/def/licenses/cc-by/4.0 ---> creativecommons.org/licenses/by/4.0
+		if (old_license.toString().contains("dcat-ap.de/def/licenses/cc-by/4.0"))
+			new_license = CurrentModel.createResource(old_license.toString()
+					.replaceAll("dcat-ap.de/def/licenses/cc-by/4.0", "creativecommons.org/licenses/by/4.0"));
+
+		// dcat-ap.de/def/licenses/dl-by-nc-de/1.0 ---> govdata.de/dl-de/by-nc-1-0
+		if (old_license.toString().contains("dcat-ap.de/def/licenses/dl-by-nc-de/1.0"))
+			new_license = CurrentModel.createResource(old_license.toString()
+					.replaceAll("dcat-ap.de/def/licenses/dl-by-nc-de/1.0", "govdata.de/dl-de/by-nc-1-0"));
+
+		// dcat-ap.de/def/licenses/odbl ---> opendefinition.org/licenses/odc-odbl
+		if (old_license.toString().contains("dcat-ap.de/def/licenses/odbl"))
+			new_license = CurrentModel.createResource(old_license.toString().replaceAll("dcat-ap.de/def/licenses/odbl",
+					"opendefinition.org/licenses/odc-odbl"));
+
+		// dcat-ap.de/def/licenses/dl-by-de/1.0 ---> govdata.de/dl-de/by-1-0
+		if (old_license.toString().contains("dcat-ap.de/def/licenses/dl-by-de/1.0"))
+			new_license = CurrentModel.createResource(
+					old_license.toString().replace("dcat-ap.de/def/licenses/dl-by-de/1.0", "govdata.de/dl-de/by-1-0"));
+
+		// dcat-ap.de/def/licenses/cc-by-nd/4.0 --->
+		// creativecommons.org/licenses/by-nd/4.0
+		if (old_license.toString().contains("dcat-ap.de/def/licenses/cc-by-nd/4.0"))
+			new_license = old_license.toString().replaceAll("dcat-ap.de/def/licenses/cc-by-nd/4.0",
+					"creativecommons.org/licenses/by-nd/4.0");
+
+		return new_license;
+	}
+
+	public static void CleanThisLicense(HashMap<Statement, Object> StatementsWithLicense,
+			HashMap<Statement, RDFNode> TheUpdater, Statement CurrentStatement, Object old_license) {
+
+		// System.out.println("License Entered:" + license);
 
 		// Its used to check if a new license or not
 		boolean isNewLicense = true;
 
+		/*
+		 * Process the old_license URI to see if they are CC or Dcat or OD which express
+		 * other existing licenses. If they express the same meaning as other existing
+		 * license then make the old_license URI homogeneous.
+		 */
+		Object license = CreativeCommonsDcatOpenDefinition_LicenseCleaner(old_license);
+
+		/*
+		 * If the processed license is not same as oldLicense then it means that the
+		 * old_license URI expresses a license already expressed by another prominent
+		 * URI. So this old_license has been cleaned and we need to update the sentence
+		 * with new license URI object.
+		 */
+		if (!old_license.equals(license))
+			TheUpdater.put(CurrentStatement, (RDFNode) license);
 		/*
 		 * This RegX is used to see if there is a similar license with https:// or
 		 * http:// or https://www. or http://www. or file:///
@@ -38,9 +137,11 @@ public class ModelHeterogeneousLicenseCleaner {
 		 * case. If we find a match then make the license homogeneous, change it to
 		 * europeandataportal type license.
 		 */
-		String PatternRegX2 = "^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.)(europeandataportal.eu\\/)";
+		String PatternRegX2 = "^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.)(europeandataportal\\.eu\\/)";
 
 		if (!(StatementsWithLicense.containsValue(license))) {
+
+			//System.out.println("Entered license : " + license.toString());
 
 			for (Statement key : StatementsWithLicense.keySet()) {
 
@@ -50,6 +151,7 @@ public class ModelHeterogeneousLicenseCleaner {
 				 * the respective statement.
 				 */
 				if (license.toString().contains("https://www.")) {
+
 					Pattern pattern1 = Pattern.compile(PatternRegX1 + Pattern.quote(license.toString().substring(12)),
 							Pattern.CASE_INSENSITIVE);
 					Matcher matcher1 = pattern1.matcher(StatementsWithLicense.get(key).toString());
@@ -171,7 +273,8 @@ public class ModelHeterogeneousLicenseCleaner {
 
 			/*
 			 * If the loop does not BREAK in the middle that means this license is a unique
-			 * URI. So add it to the license container.
+			 * URI. So add it to the unique license container. This container will be used
+			 * to check for homogeneousness.
 			 */
 			if (isNewLicense)
 				StatementsWithLicense.put(CurrentStatement, license);
@@ -179,7 +282,9 @@ public class ModelHeterogeneousLicenseCleaner {
 		}
 	}
 
-	public static Model ModelLicenCleaner(Model model) {
+	public static Model ModelLicenCleaner(Model model, String DatasetUri) {
+
+		Resource dataset = model.createResource(DatasetUri);
 
 		// Collect statements with license/rights
 		HashMap<Statement, Object> StatementsWithLicense = new HashMap<Statement, Object>();
@@ -191,34 +296,37 @@ public class ModelHeterogeneousLicenseCleaner {
 		 * First Check License and Rights info in all datasets
 		 */
 
-		StmtIterator DatasetIterator = model.listStatements(new SimpleSelector(null, RDF.type, DCAT.Dataset));
-		if (DatasetIterator.hasNext()) {
-			while (DatasetIterator.hasNext()) {
-				Statement DataSetSentence = DatasetIterator.nextStatement();
-				Resource DataSet = DataSetSentence.getSubject();
+		NodeIterator LicenseIterator = model.listObjectsOfProperty(dataset, DCTerms.license);
+		NodeIterator RightsIterator = model.listObjectsOfProperty(dataset, DCTerms.rights);
+		if (LicenseIterator.hasNext()) {
+			while (LicenseIterator.hasNext()) {
+				RDFNode LicenseNode = LicenseIterator.nextNode();
 				// System.out.println(DataSet.toString());
-				if (DataSet.hasProperty(DCTerms.license)
-						&& !(DataSet.getProperty(DCTerms.license).getObject().toString().isEmpty())) {
+				if (!(LicenseNode.toString().isEmpty())) {
 
 					// Change http to https
-					Resource new_license = model.createResource(
-							DataSet.getProperty(DCTerms.license).getObject().toString().replace("http:", "https:"));
-					DataSet.getProperty(DCTerms.license).changeObject(new_license);
+					Resource new_license = model.createResource(LicenseNode.toString().replace("http:", "https:"));
+					Statement CurrentStatement = dataset.getProperty(DCTerms.license);
+					dataset.getProperty(DCTerms.license).changeObject(new_license);
 
-					CleanThisLicense(StatementsWithLicense, TheStatementUpdater, DataSetSentence,
-							DataSet.getProperty(DCTerms.license).getObject());
+					CleanThisLicense(StatementsWithLicense, TheStatementUpdater, CurrentStatement, LicenseNode);
 
 				}
-				if (DataSet.hasProperty(DCTerms.rights)
-						&& !(DataSet.getProperty(DCTerms.rights).getObject().toString().isEmpty())) {
+			}
+		}
+		if (RightsIterator.hasNext()) {
+			while (RightsIterator.hasNext()) {
+				RDFNode RightsNode = RightsIterator.nextNode();
+				// System.out.println(DataSet.toString());
+				if (!(RightsNode.toString().isEmpty())) {
 
 					// Change http to https
-					Resource new_license = model.createResource(
-							DataSet.getProperty(DCTerms.rights).getObject().toString().replace("http:", "https:"));
-					DataSet.getProperty(DCTerms.rights).changeObject(new_license);
+					Resource new_Rights = model.createResource(RightsNode.toString().replace("http:", "https:"));
+					Statement CurrentStatement = dataset.getProperty(DCTerms.rights);
+					dataset.getProperty(DCTerms.rights).changeObject(new_Rights);
 
-					CleanThisLicense(StatementsWithLicense, TheStatementUpdater, DataSetSentence,
-							DataSet.getProperty(DCTerms.rights).getObject());
+					CleanThisLicense(StatementsWithLicense, TheStatementUpdater, CurrentStatement, RightsNode);
+
 				}
 			}
 		}
@@ -227,12 +335,12 @@ public class ModelHeterogeneousLicenseCleaner {
 		 * Now check total number of licenses and rights in distributions and collect
 		 * them
 		 */
-		StmtIterator DistributionsIterator = model
-				.listStatements(new SimpleSelector(null, RDF.type, DCAT.Distribution));
+		NodeIterator DistributionsIterator = model.listObjectsOfProperty(dataset, DCAT.distribution);
 		if (DistributionsIterator.hasNext()) {
 			while (DistributionsIterator.hasNext()) {
-				Statement DistributionSentence = DistributionsIterator.nextStatement();
-				Resource Distribution = DistributionSentence.getSubject();
+				RDFNode DistributionNode = DistributionsIterator.nextNode();
+				Resource Distribution = (Resource) DistributionNode;
+
 				// System.out.println(DataSet.toString());
 				if (Distribution.hasProperty(DCTerms.license)
 						&& !(Distribution.getProperty(DCTerms.license).getObject().toString().isEmpty())) {
@@ -242,7 +350,8 @@ public class ModelHeterogeneousLicenseCleaner {
 							.toString().replace("http:", "https:"));
 					Distribution.getProperty(DCTerms.license).changeObject(new_license);
 
-					CleanThisLicense(StatementsWithLicense, TheStatementUpdater, DistributionSentence,
+					CleanThisLicense(StatementsWithLicense, TheStatementUpdater,
+							Distribution.getProperty(DCTerms.license),
 							Distribution.getProperty(DCTerms.license).getObject());
 
 				}
@@ -254,7 +363,8 @@ public class ModelHeterogeneousLicenseCleaner {
 							Distribution.getProperty(DCTerms.rights).getObject().toString().replace("http:", "https:"));
 					Distribution.getProperty(DCTerms.rights).changeObject(new_license);
 
-					CleanThisLicense(StatementsWithLicense, TheStatementUpdater, DistributionSentence,
+					CleanThisLicense(StatementsWithLicense, TheStatementUpdater,
+							Distribution.getProperty(DCTerms.rights),
 							Distribution.getProperty(DCTerms.rights).getObject());
 
 				}
