@@ -33,11 +33,11 @@ public class ModelHeterogeneousLicenseCleaner {
 		 * “https://creativecommons.org/licenses/by/4.0/legalcode” regular users should
 		 * refer “https://creativecommons.org/licenses/by/4.0/”
 		 * 
-		 * Which is also same as all other licenses as follows: 1.
-		 * http://creativecommons.org/licenses/by/4.0/deed.no 2.
-		 * https://creativecommons.org/licenses/by/4.0/deed.de 3.
-		 * https://creativecommons.org/licenses/by/4.0/deed.es_ES where .de, .no and
-		 * .es_Es are language code for German, Norway and Spain respectively, but they
+		 * Which is also same as all other licenses as follows: 
+		 * 1. http://creativecommons.org/licenses/by/4.0/deed.no 
+		 * 2. https://creativecommons.org/licenses/by/4.0/deed.de 
+		 * 3. https://creativecommons.org/licenses/by/4.0/deed.es_ES 
+		 * where .de, .no and.es_Es are language code for German, Norway and Spain respectively, but they
 		 * refer to the same international license
 		 * “https://creativecommons.org/licenses/by/4.0/”.
 		 */
