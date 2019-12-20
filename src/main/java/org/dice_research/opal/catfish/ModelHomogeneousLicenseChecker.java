@@ -29,42 +29,39 @@ public class ModelHomogeneousLicenseChecker {
 
 			//System.out.println("Unique License to check :" + StatementsWithLicense.get(CurrentStatement));
 
-			// If creative commons license contains "legal" keyword then not homogeneous
-			Pattern pattern_CCLegalcode = Pattern.compile("\\w+(legalcode|legalcode\\/)", Pattern.CASE_INSENSITIVE);
-			Matcher matcher_CCLegalcode = pattern_CCLegalcode
-					.matcher(StatementsWithLicense.get(CurrentStatement).toString().toString());
-			if (matcher_CCLegalcode.find())
-				TotalNumberOfHetrogeneousLicenseinModel++;
-
-			// If creative commons license contains "deed.language" keyword then not
-			// homogeneous
-			Pattern pattern_CCDeed = Pattern.compile("(deed\\.\\D+)", Pattern.CASE_INSENSITIVE);
-			Matcher matcher_CCDeed = pattern_CCDeed
-					.matcher(StatementsWithLicense.get(CurrentStatement).toString().toString());
-			if (matcher_CCDeed.find())
-				TotalNumberOfHetrogeneousLicenseinModel++;
+			if (StatementsWithLicense.get(CurrentStatement).toString()
+					.matches(
+							"^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.|www\\.)(creativecommons\\.org\\/licenses\\/by\\/)(\\d+(\\.\\d+)?\\/)(legalcode)")) {
+						TotalNumberOfHetrogeneousLicenseinModel++;
+			}
 
 			if (StatementsWithLicense.get(CurrentStatement).toString()
-					.contains("opendefinition.org/licenses/cc-zero")) {
+					.matches(
+							"^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.|www\\.)(creativecommons\\.org\\/)(.+)(\\/\\d+(\\.\\d+)?\\/)(deed\\.\\D+)")) {
+						TotalNumberOfHetrogeneousLicenseinModel++;
+			}
+
+			if (StatementsWithLicense.get(CurrentStatement).toString()
+					.matches("^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.|www\\.)(opendefinition\\.org\\/licenses\\/cc-zero)")) {
 				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
 					if (StatementsWithLicense.get(CurrentStatement1).toString()
-							.contains("creativecommons.org/publicdomain/zero/1.0"))
+							.matches("^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.|www\\.)(creativecommons\\.org\\/publicdomain\\/zero\\/1\\.0)"))
 						TotalNumberOfHetrogeneousLicenseinModel++;
 				}
 			}
 
 			if (StatementsWithLicense.get(CurrentStatement).toString()
-					.contains("dcat-ap.de/def/licenses/dl-by-de/2.0")) {
+					.matches("^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.|www\\.)(dcat-ap\\.de\\/def\\/licenses\\/dl-by-de\\/2\\.0)")) {
 				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
-					if (StatementsWithLicense.get(CurrentStatement1).toString().contains("govdata.de/dl-de/by-2-0"))
+					if (StatementsWithLicense.get(CurrentStatement1).toString().matches("^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.|www\\.)(govdata\\.de\\/dl-de\\/by-2-0)"))
 						TotalNumberOfHetrogeneousLicenseinModel++;
 				}
 			}
 
 			if (StatementsWithLicense.get(CurrentStatement).toString()
-					.contains("dcat-ap.de/def/licenses/dl-zero-de/2.0")) {
+					.matches("^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.|www\\.)(dcat-ap\\.de\\/def\\/licenses\\/dl-zero-de\\/2\\.0)")) {
 				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
-					if (StatementsWithLicense.get(CurrentStatement1).toString().contains("govdata.de/dl-de/zero-2-0"))
+					if (StatementsWithLicense.get(CurrentStatement1).toString().contains("^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.|www\\.)(govdata\\.de\\/dl-de\\/zero-2-0)"))
 						TotalNumberOfHetrogeneousLicenseinModel++;
 				}
 			}
@@ -103,18 +100,20 @@ public class ModelHomogeneousLicenseChecker {
 			}
 
 			if (StatementsWithLicense.get(CurrentStatement).toString()
-					.contains("dcat-ap.de/def/licenses/dl-by-de/1.0")) {
+					.matches(
+							"^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.|www\\.)(dcat-ap\\.de\\/def\\/licenses\\/dl-by-de\\/1\\.0)")) {
 				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
-					if (StatementsWithLicense.get(CurrentStatement1).toString().contains("govdata.de/dl-de/by-1-0"))
+					if (StatementsWithLicense.get(CurrentStatement1).toString().contains("^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.|www\\.)(govdata\\.de\\/dl-de\\/by-1-0)"))
 						TotalNumberOfHetrogeneousLicenseinModel++;
 				}
 			}
 
-			if (StatementsWithLicense.get(CurrentStatement).toString()
-					.contains("dcat-ap.de/def/licenses/cc-by-nd/4.0")) {
+			if (StatementsWithLicense.get(CurrentStatement).toString().
+					matches(
+							"^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.|www\\.)(dcat-ap\\.de\\/def\\/licenses\\/cc-by-nd\\/4\\.0)")) {
 				for (Statement CurrentStatement1 : StatementsWithLicense.keySet()) {
 					if (StatementsWithLicense.get(CurrentStatement1).toString()
-							.contains("creativecommons.org/licenses/by-nd/4.0"))
+							.matches("^(https:\\/\\/|http:\\/\\/|http:\\/\\/www\\.|https:\\/\\/www\\.|www\\.)(creativecommons\\.org\\/licenses\\/by-nd\\/4\\.0)"))
 						TotalNumberOfHetrogeneousLicenseinModel++;
 				}
 			}

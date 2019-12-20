@@ -12,25 +12,8 @@ public class Catfish implements JenaModelProcessor {
 
 	public Model process(Model model, String datasetUri) throws Exception {
 
-		// LOGGER.info("Processing dataset " + datasetUri);
-
-		// Model returnModel = ModelFactory.createDefaultModel();
-		// returnModel.add(model);
-		// return returnModel;
-
-		return model;
-	}
-	
-	public Model CleanLicenses(Model model, String datasetUri) throws Exception {
-
 		ModelHeterogeneousLicenseCleaner LicenseCleaner = new ModelHeterogeneousLicenseCleaner();
 		return LicenseCleaner.ModelLicenCleaner(model,datasetUri);
-	}
-	
-	public boolean AreLicensesHomogeneous(Model model, String datasetUri) throws Exception {
-
-		ModelHomogeneousLicenseChecker LicenseChecker = new ModelHomogeneousLicenseChecker();
-		return LicenseChecker.AreLicensesHomogeneous(model,datasetUri);
 	}
 
 }
